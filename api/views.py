@@ -3,7 +3,7 @@ from django.core import serializers
 from django.http import JsonResponse
 from .models import Parcel, Operation
 
-# Create your views here.
+# Get all parcels
 def get_parcels(request):
     if request.method == "GET":
         parcels = []
@@ -16,6 +16,7 @@ def get_parcels(request):
     if request.method == "POST":
         return JsonResponse({'error':'Only GET here'}, status=400)
 
+# Get all operations for parcel by 'pk'
 def get_oper_by_parcel(request):
     if request.method == "GET":
         opers = []
