@@ -26,3 +26,11 @@ class Token(models.Model):
 
     def __str__(self):
         return 'token ' + str(self.name)
+
+# Model for Many-to-Many relationship between Token and Parcel
+class ParcelTokenLink(models.Model):
+    parcel = models.ForeignKey(Parcel, on_delete=models.CASCADE)
+    token = models.ForeignKey(Token, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return 'relate ' + str(self.parcel) + ' and ' + str(self.token)
