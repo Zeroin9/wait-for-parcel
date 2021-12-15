@@ -4,6 +4,8 @@ from django.db import models
 # Model of parcel with track-code
 class Parcel(models.Model):
     track_code = models.CharField(max_length=250, unique=True)
+    created_date = models.DateTimeField(default=datetime.now)
+    updated_date = models.DateTimeField(default=datetime.now)
 
     def __str__(self):
         return str(self.track_code)

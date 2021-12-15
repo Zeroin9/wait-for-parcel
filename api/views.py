@@ -48,6 +48,27 @@ def get_oper_by_parcel(request):
     if request.method == "POST":
         return JsonResponse({'error':'Only GET here'}, status=400)
 
+# Refresh operations for parcel by 'pk'
+def update_oper_by_parcel(request):
+    if request.method == "GET":
+        return JsonResponse({'error':'Only GET here'}, status=400)
+    if request.method == "POST":
+        parcel_pk = request.GET.get("parcel_pk")
+        if (parcel_pk is None):
+            return JsonResponse({'error':"'parcel_pk' is required"}, status=400)
+        parcel = Parcel.objects.get(id=int(parcel_pk))
+        if parcel is None:
+            return JsonResponse({'error':"not foun with such 'pk'"}, status=404)
+        operObjects = Operation.objects.filter(parcel=parcel).delete()
+        #
+        # TODO update operations from tracking API
+        #
+        opers = []
+        operObjects = Operation.objects.filter(parcel=parcel)
+        for o in operObjects:
+            opers.append(serialize_instance(o))
+        return JsonResponse({'parcel':serialize_instance(parcel), 'operations':opers})
+
 # Get new auth token
 def get_new_token(request):
     if request.method == "GET":
