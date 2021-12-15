@@ -4,28 +4,28 @@ from django.http import JsonResponse
 from .models import Parcel, Operation, Token, ParcelTokenLink
 from .authentification_utils import generate_new_token, auth_need
 
-# Get all parcels
-@auth_need
-def get_parcels(request):
-    if request.method == "GET":
-        parcels = []
-        parcelsObjects = Parcel.objects.all()
-        for p in parcelsObjects:
-            parcels.append(serialize_instance(p))
-        return JsonResponse({'parcels':parcels})
-    if request.method == "POST":
-        return JsonResponse({'error':'Only GET here'}, status=400)
-
 # Create new parcel
 @auth_need
 def for_parcel(request):
+    token = str(request.headers.get('AuthToken'))
     if request.method == "GET":
-        return JsonResponse({'error':'Only POST here'}, status=400)
+        parcel_pk = request.GET.get("pk")
+        if parcel_pk is None:
+            parcels = []
+            token_instance = Token.objects.filter(token=token)[0]
+            parcelsWithTokens = ParcelTokenLink.objects.filter(token=token_instance)
+            for p in parcelsWithTokens:
+                parcels.append(serialize_instance(p.parcel))
+            return JsonResponse({'parcels':parcels}, status=200)
+        else:
+            parcel = Parcel.objects.get(id=int(parcel_pk))
+            if parcel is None:
+                return JsonResponse({'error':"not foun with such 'pk'"}, status=404)
+            return JsonResponse(serialize_instance(parcel), status=200)
     if request.method == "POST":
-        token = request.headers.get('AuthToken')
         parcel_code = request.GET.get("code")
         if (parcel_code is None):
-            return JsonResponse({'error':"'code' is required " + str(request.data)}, status=400)
+            return JsonResponse({'error':"'code' is required "}, status=400)
         token_instance = Token.objects.filter(token=token)[0]
         parcel_instance = Parcel.objects.create(track_code=parcel_code)
         ParcelTokenLink.objects.create(parcel=parcel_instance, token=token_instance)
