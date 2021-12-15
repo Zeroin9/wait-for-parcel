@@ -25,7 +25,7 @@ class Token(models.Model):
     token = models.CharField(max_length=36, unique=True)
 
     def __str__(self):
-        return 'token ' + str(self.name)
+        return 'token ' + str(self.token)
 
 # Model for Many-to-Many relationship between Token and Parcel
 class ParcelTokenLink(models.Model):
