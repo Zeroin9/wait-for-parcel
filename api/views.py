@@ -32,19 +32,19 @@ def for_parcel(request):
         return JsonResponse({'new_parcel':serialize_instance(parcel_instance)}, status=201)
 
 # Get all operations for parcel by 'pk'
-@auth_need
 def get_oper_by_parcel(request):
     if request.method == "GET":
-        opers = []
         parcel_pk = request.GET.get("parcel_pk")
         if (parcel_pk is None):
             return JsonResponse({'error':"'parcel_pk' is required"}, status=400)
-        operObjects = Operation.objects.filter(parcel__pk=int(parcel_pk))
+        parcel = Parcel.objects.get(id=int(parcel_pk))
+        if parcel is None:
+            return JsonResponse({'error':"not foun with such 'pk'"}, status=404)
+        opers = []
+        operObjects = Operation.objects.filter(parcel=parcel)
         for o in operObjects:
-            data = serializers.serialize('json', [o])
-            struct = json.loads(data)[0]
-            opers.append(struct)
-        return JsonResponse({'operations':opers})
+            opers.append(serialize_instance(o))
+        return JsonResponse({'parcel':serialize_instance(parcel), 'operations':opers})
     if request.method == "POST":
         return JsonResponse({'error':'Only GET here'}, status=400)
 
