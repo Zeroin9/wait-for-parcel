@@ -1,4 +1,5 @@
 import uuid
+from django.http import JsonResponse
 from .models import Token
 
 # check valid of token
@@ -20,3 +21,16 @@ def generate_new_token():
         tokenInstance = Token(token=new_token)
         tokenInstance.save()
         return new_token
+
+# Decorator for function with auth
+def auth_need(function):
+    def wrapper(request):
+        token = request.headers.get('AuthToken')
+        if token is None:
+            return JsonResponse({'error':'Cant find AuthToken'}, status=400)
+        is_valid = check_auth(str(token))
+        if is_valid is True:
+            return function(request)
+        else:
+            return JsonResponse({'error':'Token is invalid'}, status=401)
+    return wrapper
