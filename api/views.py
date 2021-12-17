@@ -1,8 +1,11 @@
 import json
+from datetime import datetime
 from django.core import serializers
 from django.http import JsonResponse
+from django.utils.timezone import get_current_timezone
 from .models import Parcel, Operation, Token, ParcelTokenLink
 from .authentification_utils import generate_new_token, auth_need
+from .tracking_utils import get_opers
 
 # Create new parcel
 @auth_need
@@ -62,12 +65,21 @@ def update_oper_by_parcel(request):
             parcel = Parcel.objects.get(id=int(parcel_pk))
         except Exception:
             return JsonResponse({'error':"not foun with such 'pk'"}, status=404)
-        operObjects = Operation.objects.filter(parcel=parcel).delete()
-        #
-        # TODO update operations from tracking API
-        #
-        opers = []
+        opers_data = get_opers(parcel.track_code)
+        if opers_data is None:
+            return JsonResponse({'error':"tracking.pochta.ru API problem"}, status=503)
+        Operation.objects.filter(parcel=parcel).delete()
+        parcel.updated_date = datetime.now(tz=get_current_timezone())
+        for oper_data in opers_data:
+            Operation.objects.create(
+                date=oper_data['date'],
+                postOfficeIndex=oper_data['index'],
+                postOfficeName=oper_data['post_office'],
+                name=oper_data['oper_name'],
+                parcel=parcel
+            )
         operObjects = Operation.objects.filter(parcel=parcel)
+        opers = []
         for o in operObjects:
             opers.append(serialize_instance(o))
         return JsonResponse({'parcel':serialize_instance(parcel), 'operations':opers})
