@@ -18,8 +18,9 @@ def for_parcel(request):
                 parcels.append(serialize_instance(p.parcel))
             return JsonResponse({'parcels':parcels}, status=200)
         else:
-            parcel = Parcel.objects.get(id=int(parcel_pk))
-            if parcel is None:
+            try:
+                parcel = Parcel.objects.get(id=int(parcel_pk))
+            except Exception:
                 return JsonResponse({'error':"not foun with such 'pk'"}, status=404)
             return JsonResponse(serialize_instance(parcel), status=200)
     if request.method == "POST":
@@ -37,8 +38,9 @@ def get_oper_by_parcel(request):
         parcel_pk = request.GET.get("parcel_pk")
         if (parcel_pk is None):
             return JsonResponse({'error':"'parcel_pk' is required"}, status=400)
-        parcel = Parcel.objects.get(id=int(parcel_pk))
-        if parcel is None:
+        try:
+            parcel = Parcel.objects.get(id=int(parcel_pk))
+        except Exception:
             return JsonResponse({'error':"not foun with such 'pk'"}, status=404)
         opers = []
         operObjects = Operation.objects.filter(parcel=parcel)
@@ -56,8 +58,9 @@ def update_oper_by_parcel(request):
         parcel_pk = request.GET.get("parcel_pk")
         if (parcel_pk is None):
             return JsonResponse({'error':"'parcel_pk' is required"}, status=400)
-        parcel = Parcel.objects.get(id=int(parcel_pk))
-        if parcel is None:
+        try:
+            parcel = Parcel.objects.get(id=int(parcel_pk))
+        except Exception:
             return JsonResponse({'error':"not foun with such 'pk'"}, status=404)
         operObjects = Operation.objects.filter(parcel=parcel).delete()
         #
