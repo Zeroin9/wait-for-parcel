@@ -20,12 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^8rvvka(m!5g@%bu5aeo@+m&3(whaxe=e2_=2q5*mew2eohmqt'
+SECRET_KEY = 'django-insecure-^8rvvka(m!5g@%bu5aeo@+m&3(whaxe=e2_=2q5*mew2eohmqt' #fix in prod
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['ishchi.pythonanywhere.com']
+ALLOWED_HOSTS = ['*'] #fix in prod
 
 
 # Application definition
@@ -37,10 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api'
+    'api',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -131,3 +134,18 @@ MEDIA_ROOT = '/home/ishchi/waitforparcel/media'
 MEDIA_URL = '/media/'
 STATIC_ROOT = '/home/ishchi/waitforparcel/static'
 STATIC_URL = '/static/'
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "authtoken"
+]
