@@ -57,29 +57,38 @@ const Parcel = () => {
     }, [])
 
     if (error) {
-        return <div>Error: {error.message}</div>;
+        return (
+            <div>
+                <h3 class="text-danger">Ошибка: {error.message}</h3>
+                <a href={"/parcel/" + parcelId} class="btn btn-info mt-2" role="button" aria-pressed="true">
+                    Назад
+                </a>
+            </div>
+        
+        );
     }
     if (!isLoaded) {
-        return <div>Loading...</div>;
+        return <h3 class="text-info">Загружаю...</h3>;
     }  
     
     if (parcel) {
         return (
             <div>
-                <div>
-                    <Link to={`/`}>Назад</Link>
+                <div class="page-header mt-2">
+                    <h1>
+                        {parcelFields.track_code}
+                    </h1>
                 </div>
-                <div>
-                    <h1>{parcelFields.track_code}</h1>
-                    <div>
-                        {opers.map(oper => (
-                            <div>
-                                {oper.fields.postOfficeIndex},  {oper.fields.postOfficeName}:  {oper.fields.name} -  {Moment(oper.fields.date).format('d.MM.yyyy')}
+                <div class="list-group mt-2">
+                    {opers.map(oper => (
+                            <div class="list-group-item mt-2">
+                                <a href={"https://www.pochta.ru/offices/" + oper.fields.postOfficeIndex}>{oper.fields.postOfficeIndex}, {oper.fields.postOfficeName}</a>: {oper.fields.name} - {Moment(oper.fields.date).format('d.MM.yyyy')}
                             </div>
-                        ))}
-                    </div>
-                    <button onClick = {handleClick}>Обновить</button>
-                </div>
+                    ))}
+                </div> 
+                <button type="button" class="btn btn-lg btn-info float-right mt-2" onClick = {handleClick}>
+                    Обновить
+                </button>
             </div>
         );
     }

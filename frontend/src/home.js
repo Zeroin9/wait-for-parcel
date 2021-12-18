@@ -65,21 +65,30 @@ const Home = () => {
     }, [])
 
     if (error) {
-        return <div>Error: {error.message}</div>;
+        return <h3 class="text-danger">Ошибка: {error.message}</h3>;
     } else if (!isLoaded) {
-        return <div>Loading...</div>;
+        return <h3 class="text-info">Загружаю...</h3>;
     } else {
         return (
             <div>
-                <input placeholder = {"Формата AA000000000RU или 12345678901234"} type="text" value = {barcode} onChange = {event => setBarcode(event.target.value.toUpperCase())}/>
-                <button onClick= {handleClick}>Добавить</button>
-            <div>
+                <div class="page-header mt-2">
+                    <h1>
+                        Жду Посылку! <small>Сервис отслеживания отправлений.</small>
+                    </h1>
+                </div>
+                <label for="exampleInputEmail1">
+                    Номер отправления
+                </label>
+                <input placeholder="Формата AA000000000RU или 12345678901234" type="text" class="form-control mt-2"
+                    value = {barcode} onChange = {event => setBarcode(event.target.value.toUpperCase())}/>
+                <button type="button" class="btn btn-primary btn-lg btn-block mt-2" onClick = {handleClick}>
+                    Добавить в список
+                </button>
                 {parcels.map(parcel => (
                     <div>
-                        <Link to={`parcel/${parcel.pk}`}>{parcel.fields.track_code}</Link>
+                        <Link to={`parcel/${parcel.pk}`}><h3 class="text-center text-info mt-2">{parcel.fields.track_code}</h3></Link>
                     </div>
                 ))}
-            </div>
             </div>
         );
     }
