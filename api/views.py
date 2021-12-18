@@ -11,28 +11,33 @@ from .tracking_utils import get_opers
 @auth_need
 def for_parcel(request):
     token = str(request.headers.get('AuthToken'))
-    if request.method == "GET":
+    token_instance = Token.objects.filter(token=token)[0]
+    if request.method == "GET": # get method
         parcel_pk = request.GET.get("pk")
-        if parcel_pk is None:
+        if parcel_pk is None: # Get all
             parcels = []
-            token_instance = Token.objects.filter(token=token)[0]
             parcelsWithTokens = ParcelTokenLink.objects.filter(token=token_instance)
             for p in parcelsWithTokens:
                 parcels.append(serialize_instance(p.parcel))
             return JsonResponse({'parcels':parcels}, status=200)
-        else:
+        else: # get with this pk
             try:
                 parcel = Parcel.objects.get(id=int(parcel_pk))
             except Exception:
                 return JsonResponse({'error':"not foun with such 'pk'"}, status=404)
             return JsonResponse(serialize_instance(parcel), status=200)
-    if request.method == "POST":
+    if request.method == "POST": # create new
         parcel_code = request.GET.get("code")
-        if (parcel_code is None):
+        if (parcel_code is None or parcel_code == ""):
             return JsonResponse({'error':"'code' is required "}, status=400)
-        token_instance = Token.objects.filter(token=token)[0]
-        parcel_instance = Parcel.objects.create(track_code=parcel_code)
-        ParcelTokenLink.objects.create(parcel=parcel_instance, token=token_instance)
+        try:
+            parcel_instance = Parcel.objects.filter(track_code=parcel_code)[0]
+            same = ParcelTokenLink.objects.filter(token=token_instance, parcel=parcel_instance).count()
+            if same == 0:
+                ParcelTokenLink.objects.create(parcel=parcel_instance, token=token_instance)
+        except Exception:
+            parcel_instance = Parcel.objects.create(track_code=parcel_code)
+            ParcelTokenLink.objects.create(parcel=parcel_instance, token=token_instance)
         return JsonResponse({'new_parcel':serialize_instance(parcel_instance)}, status=201)
 
 # Get all operations for parcel by 'pk'
