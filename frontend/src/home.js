@@ -31,7 +31,8 @@ const Home = () => {
     }
 
     useEffect(() => {
-        if (localStorage.getItem("z3r0token") === null) {
+        var token = localStorage.getItem("z3r0token");
+        if (token === null) {
             const requestOptions = {
                 method: 'POST'
             };
@@ -39,6 +40,7 @@ const Home = () => {
             .then(res => res.json())
                 .then(
                     (data) => {
+                        token = data.token;
                         localStorage.setItem('z3r0token', data.token);
                     },
                     (error) => {
@@ -48,7 +50,7 @@ const Home = () => {
         }
         const requestOptions = {
             method: 'GET',
-            headers: { 'AuthToken': localStorage.getItem("z3r0token") }
+            headers: { 'AuthToken': token }
         };
         fetch('http://127.0.0.1:8000/api/parcel', requestOptions)
             .then(res => res.json())
@@ -84,11 +86,11 @@ const Home = () => {
                 <button type="button" class="btn btn-primary btn-lg btn-block mt-2" onClick = {handleClick}>
                     Добавить в список
                 </button>
-                {parcels.map(parcel => (
+                {parcels ? parcels.map(parcel => (
                     <div>
                         <Link to={`parcel/${parcel.pk}`}><h3 class="text-center text-info mt-2">{parcel.fields.track_code}</h3></Link>
                     </div>
-                ))}
+                )) : <div></div>}
             </div>
         );
     }
